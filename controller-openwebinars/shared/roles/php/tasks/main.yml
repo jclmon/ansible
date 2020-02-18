@@ -1,0 +1,7 @@
+---
+
+- import_tasks: roles/apache/handler/main.yml
+
+- name: Install de PHP packages
+  apt: name={{ php_packages }} state=present
+  notify: restart apache2

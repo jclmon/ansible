@@ -1,0 +1,4 @@
+---
+- name: Install Apache 2 package
+  apt: name=apache2 state=present
+  notify: "start web services"

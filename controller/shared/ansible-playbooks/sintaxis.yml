@@ -1,0 +1,28 @@
+---
+# Programming languages
+languages:
+	- PHP
+	- NodeJS
+	- Java
+	- C
+	- Python
+#Employee
+mario:
+	- nombre: "Mario"
+	- lastname: "Pérez Esteso"
+	- twitter: "@marioperest"
+	- job: "backend developer"
+	- languages:
+		- PHP
+		- NodeJS
+		- Python
+		- Java
+	- frameworks:
+		- PHP:
+			- Laravel
+			- Symphony
+		- Python:
+			- Django
+		- Java:
+			- Spring
+...

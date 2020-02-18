@@ -1,0 +1,9 @@
+---
+
+- name: Web servers playbook
+  hosts: webservers
+  roles:
+    - apache
+    - php
+    - wordpress
+...

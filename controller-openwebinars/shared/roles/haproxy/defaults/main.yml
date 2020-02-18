@@ -1,0 +1,28 @@
+---
+
+haproxy_socket: /var/lib/haproxy/stats
+haproxy_chroot: /var/lib/haproxy
+haproxy_user: haproxy
+haproxy_group: haproxy
+
+#frontend settings
+haproxy_frontend_name: 'hafrontend'
+haproxy_frontend_bind_address: '*'
+haproxy_frontend_port: 80
+haproxy_frontend_mode: 'http'
+
+#backend settings
+haproxy_backend_name: 'habackend'
+haproxy_backend_mode: 'http'
+haproxy_backend_balance_method: 'roundrobin'
+
+#web backend servers
+haproxy_backend_servers:
+  - name: webserver-one
+    address: 192.168.33.12
+  - name: webserver-two
+    address: 192.168.33.13
+
+# Stats credetials
+haproxy_stats_user: 'root'
+haproxy_stats_password: '1234'

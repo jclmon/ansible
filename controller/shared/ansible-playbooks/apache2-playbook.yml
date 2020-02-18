@@ -1,0 +1,14 @@
+---
+
+- hosts: all
+  remote_user: root
+  tasks:
+    - name: Install Apache 2 package
+      apt: name=apache2 state=present
+      notify: "start web services"
+  handlers:
+    - name: start apache2
+      service: name=php state=started enabled=yes
+      listen: "start web services"
+
+...

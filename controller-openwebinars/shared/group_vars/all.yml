@@ -1,0 +1,6 @@
+---
+
+dbname: "wordpressdb"
+dbuser: "wpuser"
+dbpass: "wppass"
+dbhost: 192.168.33.14
