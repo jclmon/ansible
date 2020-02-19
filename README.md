@@ -1,48 +1,47 @@
 # ANSIBLE
 
 ## Instalación
-´´´
+```
 $ apt-get update 
 $ apt-get install software-properties-common python-software-properties
 $ apt-add-repository ppa:ansible/ansible 
 $ apt-get update 
 $ apt-get install ansible
-
-´´´
+```
 Añadimos las direcciones de nuestras máquinas Vagrant IP al fichero /etc/ansible/hosts en la máquina controller:
-´´´
+---
+```
 cat /etc/ansible/hosts
 192.168.33.11 # node-one 
 192.168.33.12 # node-two 
-´´´
+```
 
 ### Primeros comandos
 Documentación ansible http://docs.ansible.com
-´´´
+```
 ansible all -a "hostname" -f
 ansible all -a "hostname" -f 1
 ansible all -a "free -m"
 ansible all -a "df -h" 
 ansible all -a "date"
-´´´
+```
 
 ## Facts
 En la jerga Ansible, los facts son los detalles de un determinado servidor o grupo de servidores. 
 Es posible obtener una lista exhaustiva de los facts haciendo uso del módulo setup: 
-
-´´´
+```
 $ ansible all -m setup 
-´´´
+```
 
 ## MÓDULOS 
 
 ### Módulo APT
 Instalación de NTP (nombre y estado en el que debe estar)
-´´´
+```
 $ ansible all -m apt -a "name=ntp state=present" -u root
 $ ansible all -m apt -a "name=ntp state=absent" -u root
 $ ansible all -a "service ntp status"
-´´´
+```
 
 ### Módulo SERVICIOS
 Activación del servicio NTP
@@ -136,6 +135,7 @@ ansible-playbook apache-playbook.yml
 Otro cambio en el playbook
 ---
 ```
+---
 - hosts: 192.168.33.11
   remote_user: root
   tasks:
@@ -177,8 +177,10 @@ become: yes
 become_user: www-data 
 ```
 Además, es posible especificar el orden en el que se ejecutan las tareas en los hosts haciendo uso del módulo order:
+```
 - hosts: all 
 order: sorted 
+```
 
 ## LISTA DE TAREAS
 Cada play contiene una lista de tareas, las cuales se ejecutan en orden y solo una al mismo tiempo. Es importante saber que el orden de las tareas es el mismo para todos los nodos.
@@ -188,7 +190,8 @@ Todas las tareas deben tener un name, el cual se incluye en la salida del comand
 Las tareas se declaran en el formato module: options. En un ejemplo anterior nos segurábamos de que el servicio apache2 se estuviese ejecutando:
 
 ```
---- hosts: all 
+--- 
+hosts: all 
 remote_user: root 
 tasks: 
 - name: ensure apache is running 
@@ -196,7 +199,8 @@ service: name=apache2 state=started enabled=yes
 ``` 
 Los módulos command y shell son los únicos comandos que no utilizan el formato clave=valor, sino que directamente se le pasa como parámetro el comando que deseamos ejecutar:
 ```
---- hosts: all 
+--- 
+hosts: all 
 remote_user: root 
 tasks: 
 - name: Run a command 
@@ -269,7 +273,6 @@ Se refiere al tipo de conexión que se va a utilizar. Por defecto es SSH, pero t
 Sirve para ejecutar un playbook en check mode, es decir, que todas las tareas definidas se comprobarán en todos los hosts, pero ninguna llegará a ejecutarse.
 
 ## HOSTS Y GRUPOS
-
 Ansible ejecuta los playbooks en múltiples servidores al mismo tiempo dentro de una infraestructura.
 Estos servidores se almacenan en un inventario, que por defecto es /etc/ansible/hosts, pero que nosotros podemos configurar con el parámetro -i.
 
@@ -287,7 +290,6 @@ Las cabeceras entre corchetes son los nombres de grupo, los cuales se utilizan p
 Es correcto poner varios sistemas en diferentes grupos, ya que una máquina puede ser al mismo tiempo un servidor web y un servidor de base de datos.
 
 ### HOSTS Y GRUPOS - PUERTOS
-
 Si tienes sistemas que ejecutan SSH en un puerto no estándar, es posible especificar dicho puerto:
 ```
 mail.geekytheory.com:2222 
@@ -298,7 +300,6 @@ database.geekytheory.com:5301
 ``` 
 
 ### HOSTS Y GRUPOS - PATRONES
-
 En caso de que tengamos muchos hosts que siguen un mismo patrón, podemos hacer lo siguiente en lugar de ponerlos todos en la lista:
 ```
 [webserver] 
@@ -375,6 +376,7 @@ Los child groups tienen dos propiedades que merece la pena mencionar:
     Las variables de un grupo hijo sobreescriben las de un grupo padre. 
 
 Ejemplo de playbook para orquestar los servidores:
+---
 ```
 --- 
 # Configuración común a todos los servidores. 
@@ -413,22 +415,17 @@ roles:
 En los inventarios de Ansible existen dos grupos por defecto: all y ungrouped. all contiene a todos los hosts y ungrouped contiene a los hosts que no están asociados a ningún grupo.
 
 ## ORGANIZACIÓN DE VARIABLES
-
 Una buena práctica en Ansible es la de no almacenar las variables en el fichero principal de inventario.
+Es posible separar las variables para determinados grupos o para determinar.
 
-Es posible separar las variables para determinados grupos o para determinar
+Aunque es posible escribir un playbook en un archivo muy largo, lo habitual es tratar de reutilizar partes del proyecto Ansible y tener todo organizado. En su nivel más básico, incluir archivos con tareas nos permite dividir grandes archivos de configuración en otros más pequeños.
 
-Aunque es posible escribir un playbook en un archivo muy largo, lo habitual es tratar de reutilizar partes del proyecto Ansible y tener todo organizado. 
-En su nivel más básico, incluir archivos con tareas nos permite dividir grandes archivos de configuración en otros más pequeños.
-
-Los roles en Ansible se utilizan con la idea de que incluir archivos con tareas y combinarlos pueden formar un proyecto limpio y con partes reutilizables. 
-Comenzaremos explicando lo que son los includes antes de aprender a controlar los roles.
+Los roles en Ansible se utilizan con la idea de que incluir archivos con tareas y combinarlos pueden formar un proyecto limpio y con partes reutilizables. Comenzaremos explicando lo que son los includes antes de aprender a controlar los roles.
 
 # ROLES E INCLUDES
-
 Ya hemos visto en capítulos anteriores cómo instalar un servidor Apache y asegurarnos de que se esté ejecutando en varios servidores. ¿Y si quisiéramos reutilizar esas instrucciones?
-INCLUDES DE TAREAS
 
+## INCLUDES DE TAREAS
 Este es el playbook original:
 ```
 - hosts: all 
@@ -459,7 +456,6 @@ service: name=apache2 state=started enabled=yes
 Y podríamos reutilizarlo desde cualquier parte del proyecto.
 
 ## INCLUDES DE HANDLERS
-
 Los handlers pueden incluirse de igual manera que las tareas, pero en la sección correspondiente. En capítulos anteriores teníamos este ejemplo:
 ```
 handlers: 
@@ -478,7 +474,6 @@ service: name=apache state=restarted
 Y en la sección de handlers tendríamos que hacer el include:
 ```
 handlers:
-
     include: included-handlers.yml 
 ```
 ## INCLUDES DE PLAYBOOKS
@@ -497,7 +492,8 @@ Un playbook puede ser incluido en otro playbook utilizando la misma sintaxis de 
 ## INCLUDES DINÁMICOS
 A partir de Ansible 2.0 los includes pueden ser dinámicos haciendo uso de bucles:
 ```
---- hosts: all 
+--- 
+hosts: all 
 remote_user: root 
 tasks: 
 - include: foo.yml param={{ item }} 
@@ -509,7 +505,8 @@ with_items:
 foo.yml: 
 ---
 ```
---- name: "Echoing params" 
+--- 
+name: "Echoing params" 
 command: echo "{{ param }}" 
  ```
  
@@ -528,12 +525,9 @@ tasks:
 - include: tasks/mysql.yml 
 ```
 
-Separar las tareas en diferentes archivos quiere decir que tendremos más archivos que gestionar, pero hará que nuestro playbook sea más mantenible. Es mucho más fácil mantener pequeños grupos de tareas relacionadas entre sí que un playbook excesivamente largo.
-
-El uso de tags también facilita la organización en un proyecto.
+Separar las tareas en diferentes archivos quiere decir que tendremos más archivos que gestionar, pero hará que nuestro playbook sea más mantenible. Es mucho más fácil mantener pequeños grupos de tareas relacionadas entre sí que un playbook excesivamente largo. El uso de tags también facilita la organización en un proyecto.
 
 ## ROLES
-
 Ahora que ya sabemos lo que es una tarea, un handler o un include, sabemos que un proyecto en Ansible puede ser organizado para que sea mantenible. Si ya sabemos todo esto, ¿para qué sirven los roles?
 
 Cuando nuestra aplicación crece y hacemos includes, podemos llegar a transformar la aplicación en algo ilegible porque tendríamos un include dentro de otro infinitamente.
@@ -559,7 +553,6 @@ roles/
  
 ```
 ### ROLES - ESTRUCTURA
-
 En un playbook podríamos utilizarlo de la siguiente manera:
 ```
     hosts: webservers
@@ -577,7 +570,6 @@ El comportamiento de un role es:
 Si algún directorio no existe, simplemente se ignora.
 
 ### ROLES PARAMETRIZADOS
-
 De igual manera que los includes, los roles también pueden recibir parámetros añadiendo variables para ser reutilizados. Por ejemplo:
 ```
 - hosts: webservers 
@@ -587,6 +579,7 @@ roles:
 - { role: custom_role, foo: ‘2’, bar: ‘2’ } 
 ``` 
 Es muy útil añadir tags a los roles para que sea más fácil ejecutarlos a nuestro gusto:
+---
 ```
 - hosts: webservers 
 roles: 
@@ -596,7 +589,6 @@ roles:
 Con esto asignamos tags a todas las tareas de un role, es decir, que las sobreescribimos.
 
 ### ROLES - PRE_TASKS y POST_TASKS
-
 Si queremos que determinadas tareas se ejecuten antes y después de que los roles sean aplicados, debemos utilizar las pre_tasks y post_tasks:
 ```
 - hosts: webservers 
@@ -611,14 +603,11 @@ post_tasks:
  ```
 
 ### ROLES - VARIABLES POR DEFECTO
-
 Las variables por defecto de un role se añaden a default/main.yml dentro del directorio de nuestro role.
-
 Estas variables tienen la prioridad más baja de entre todas las variables disponibles y pueden ser sobreescritas fácilmente por otra variable, incluidas las de los inventarios.
-ROLES - DEPENDENCIAS
 
+### ROLES - DEPENDENCIAS
 Las dependencias nos permiten ejecutar roles dentro de roles. Se almacenan dentro del directorio meta/main.yml.
-
 Este archivo debe incluir una lista de dependencias de roles y parámetros a ejecutar. dependencies:
 ```
 - { role: '/path/to/roles/foo', bar: 50 } 
